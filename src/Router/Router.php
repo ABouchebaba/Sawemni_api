@@ -21,27 +21,28 @@ class Router
 
     public function get($path, $callable ){
 
-        $this->addRoute($path, $callable, "GET");
+        return $this->addRoute($path, $callable, "GET");
     }
 
     public function post($path, $callable ){
 
-        $this->addRoute($path, $callable, "POST");
+        return $this->addRoute($path, $callable, "POST");
     }
 
     public function put($path, $callable)
     {
-        $this->addRoute($path, $callable, "PUT");
+        return $this->addRoute($path, $callable, "PUT");
     }
 
     public function del($path, $callable)
     {
-        $this->addRoute($path, $callable, "DELETE");
+        return $this->addRoute($path, $callable, "DELETE");
     }
 
     public function addRoute($path, $callable, $methode){
         $route = new Route($path, $callable);
         $this->routes[$methode][] = $route;
+        return $route;
     }
 
     public function run()

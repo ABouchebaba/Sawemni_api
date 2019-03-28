@@ -17,11 +17,13 @@ $router->get("/products", "ProductController.read_all");
 
 $router->get("/products/:id", "ProductController.read");
 
+$router->get("/products/barcode/:barcode", "ProductController.barcode");
+
+$router->get("/products/name/:name", "ProductController.search");
+
 /*************** POST  *************************************/
 
-$router->post("/products/:id", function ($id) {
-    echo "Getting Products ". $id;
-});
+$router->post("/products", "ProductController.create");
 
 /*************** PUT  *************************************/
 
