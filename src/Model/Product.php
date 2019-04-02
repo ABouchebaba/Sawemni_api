@@ -94,7 +94,16 @@ class Product
     //update a product
     public function update(){
         //select query
-        $query = "UPDATE `products` SET `PName` = ?, `category` = ?, `barcode` = ?, `producer` = ?, `description` = ?, `RefPrice` = ?, `updated_at` = CURRENT_TIMESTAMP, `imgURL` = ? WHERE `products`.`id` = ?";
+        $query = "UPDATE `products` 
+                  SET `PName` = ?,
+                  `category` = ?,
+                  `barcode` = ?,
+                  `producer` = ?,
+                  `description` = ?,
+                  `RefPrice` = ?,
+                  `updated_at` = CURRENT_TIMESTAMP,
+                  `imgURL` = ? 
+                  WHERE `products`.`id` = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
 

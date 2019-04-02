@@ -1,10 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: amine
- * Date: 25/03/2019
- * Time: 16:02
- */
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Referer,Accept,Origin,User-Agent,Content-Type");
+header("Access-Control-Allow-Methods: POST, GET, DELETE, PUT, OPTIONS");
 
 require "vendor/autoload.php";
 
@@ -20,20 +18,48 @@ $router->get("/products/:id", "ProductController.read");
 $router->get("/products/barcode/:barcode", "ProductController.barcode");
 
 $router->get("/products/name/:name", "ProductController.search");
+$router->get("/markets", "MarketController.read_all");
+
+$router->get("/markets/:id", "MarketController.read");
+
+$router->get("/markets/price", "MarketController.read_allPrice");
+
+$router->get("/markets/price/:id", "MarketController.readPrice");
 
 /*************** POST  *************************************/
 
 $router->post("/products", "ProductController.create");
 
+$router->post("/markets", "MarketController.create");
+
+$router->post("/markets/price", "MarketController.createPrice");
+
 /*************** PUT  *************************************/
 
-$router->put("/products", "ProductController.update");
+$router->put("/products/:id", "ProductController.update");
+
+$router->put("/markets/:id", "MarketController.update");
+
+$router->put("/markets/price/", "MarketController.updatePrice");
 
 /*************** DEL  *************************************/
 
-$router->del("/products/", "ProductController.delete");
+$router->del("/products/:id", "ProductController.delete");
 
+$router->del("/markets/:id", "MarketController.delete");
+
+$router->del("/markets/price/:id", "MarketController.deletePrice");
+/*************** OPTIONS  *************************************/
 
 /**************************************************************/
 
-$router->run();
+try {
+    http_response_code(200);
+    echo $router->run();
+}
+catch(Exception $e){
+//    http_response_code(400);
+    echo json_encode(
+        array("message" => "Route error")
+    );
+}

@@ -50,6 +50,7 @@ class Router
         $method = $_SERVER["REQUEST_METHOD"];
 
         if (!isset($this->routes[$method])){
+            // Only GET, POST, PUT, DELETE are supported
             throw new RouteException("Request type not supported");
         }
         foreach ($this->routes[$method] as $route){
@@ -57,6 +58,8 @@ class Router
                 return $route->call();
             }
         }
+
+        // No matching routes => Error message
         throw new RouteException("No matching routes");
     }
 
