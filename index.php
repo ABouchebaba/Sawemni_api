@@ -18,6 +18,7 @@ $router->get("/products/:id", "ProductController.read");
 $router->get("/products/barcode/:barcode", "ProductController.barcode");
 
 $router->get("/products/name/:name", "ProductController.search");
+
 $router->get("/markets", "MarketController.read_all");
 
 $router->get("/markets/:id", "MarketController.read");
@@ -25,6 +26,8 @@ $router->get("/markets/:id", "MarketController.read");
 $router->get("/markets/price", "MarketController.read_allPrice");
 
 $router->get("/markets/price/:id", "MarketController.readPrice");
+
+$router->get("/users/", "UserController.read_all");
 
 /*************** POST  *************************************/
 
@@ -38,7 +41,12 @@ $router->post("/markets/price", "MarketController.createPrice");
 
 $router->put("/products/:id", "ProductController.update");
 
+
 //$router->put("/products/image/:image", "ProductController.update");
+
+$router->put("/users/:id", "UserController.update");
+
+
 
 $router->put("/markets/:id", "MarketController.update");
 
