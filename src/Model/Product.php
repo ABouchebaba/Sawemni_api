@@ -77,7 +77,22 @@ class Product
             $this->price,
             $this->imgURL
         ]);
-        return $stmt;
+        $stmt = $this->conn->prepare("SELECT LAST_INSERT_ID();");
+        $stmt->execute();
+
+        $id =  $stmt->fetch()[0];
+
+        // return the created product
+        return array(
+            "id" => $id,
+            "PName" => $this->name,
+            "category" => $this->category,
+            "barcode" => $this->barcode,
+            "producer" => $this->producer,
+            "description" => $this->description,
+            "RefPrice" => $this->price,
+            "imgURL" => $this->imgURL
+        );
     }
 
     //delete a product
@@ -128,7 +143,17 @@ class Product
             $this->imgURL,
             $this->id
         ]);
-        return $stmt;
+
+        return array(
+            "id" => $this->id,
+            "PName" => $this->name,
+            "category" => $this->category,
+            "barcode" => $this->barcode,
+            "producer" => $this->producer,
+            "description" => $this->description,
+            "RefPrice" => $this->price,
+            "imgURL" => $this->imgURL
+        );
     }
 
     public function barcode($barcode) {

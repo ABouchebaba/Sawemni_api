@@ -59,10 +59,26 @@ class Market
         $this->isActive = htmlspecialchars(strip_tags($this->isActive));
 
         //execute query
-        $stmt->execute([$this->name,
+        $stmt->execute([
+            $this->name,
             $this->logo,
             $this->isActive]);
-        return $stmt;
+
+
+        $stmt = $this->conn->prepare("SELECT LAST_INSERT_ID();");
+        $stmt->execute();
+
+        $id =  $stmt->fetch()[0];
+
+        // return the created product
+        return array(
+            "id" => $id,
+            "name" => $this->name,
+            "logo" => $this->logo,
+            "isActive" => $this->isActive
+        );
+
+
     }
 
     //delete a product
@@ -96,6 +112,12 @@ class Market
             $this->isActive,
             $this->id
         ]);
-        return $stmt;
+
+        return array(
+            "id" => $this->id,
+            "name" => $this->name,
+            "logo" => $this->logo,
+            "isActive" => $this->isActive
+        );
     }
 }

@@ -38,6 +38,8 @@ $router->post("/markets/price", "MarketController.createPrice");
 
 $router->put("/products/:id", "ProductController.update");
 
+//$router->put("/products/image/:image", "ProductController.update");
+
 $router->put("/markets/:id", "MarketController.update");
 
 $router->put("/markets/price/", "MarketController.updatePrice");

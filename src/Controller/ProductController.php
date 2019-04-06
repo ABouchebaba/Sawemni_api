@@ -54,23 +54,32 @@ class ProductController
         $product = new Product($db);
 
         //get product id to be edited
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //Save the image to the file system
+        // returns the path in which the image has been saved
+        $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
+
+        // if image not saved to file system => return error message
+        if(!$img["saved"]){
+            return json_encode(
+                array("message"=>"Unable to save product image.(update product)")
+            );
+        }
 
         //set product property values
         $product->id = $id;
-        $product->name = $data->PName;
-        $product->category = $data->category;
-        $product->barcode = $data->barcode;
-        $product->producer = $data->producer;
-        $product->description = $data->description;
-        $product->price = $data->RefPrice;
-        $product->imgURL = $data->imgURL;
+        $product->name = $data[0]["PName"];
+        $product->category = $data[0]["category"];
+        $product->barcode = $data[0]["barcode"];
+        $product->producer = $data[0]["producer"];
+        $product->description = $data[0]["description"];
+        $product->price = $data[0]["RefPrice"];
+        $product->imgURL = $img["path"];
 
-        //lets create product now
-        if ($product->update()) {
-            return json_encode(
-                array("message"=>"Product was updated.")
-            );
+        //lets update product now
+        if ($res = $product->update()) {
+            return json_encode($res);
         } else { // if unable to do so
             return json_encode(
                 array("message"=>"Unable to update product.")
@@ -105,22 +114,31 @@ class ProductController
         $product = new Product($db);
 
         //get posted data
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //Save the image to the file system
+        // returns the path in which the image has been saved
+        $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
+
+        // if image not saved to file system => return error message
+        if(!$img["saved"]){
+            return json_encode(
+                array("message"=>"Unable to save product image.(create product)")
+            );
+        }
 
         //set product property values
-        $product->name = $data->PName;
-        $product->category = $data->category;
-        $product->barcode = $data->barcode;
-        $product->producer = $data->producer;
-        $product->description = $data->description;
-        $product->price = $data->RefPrice;
-        $product->imgURL = $data->imgURL;
+        $product->name = $data[0]["PName"];
+        $product->category = $data[0]["category"];
+        $product->barcode = $data[0]["barcode"];
+        $product->producer = $data[0]["producer"];
+        $product->description = $data[0]["description"];
+        $product->price = $data[0]["RefPrice"];
+        $product->imgURL = $img["path"];
 
         //lets create product now
-        if($product->create()) {
-            return json_encode(
-                array("message"=>"Product was created.")
-            );
+        if($res = $product->create()) {
+            return json_encode($res);
         }
         else { // if unable to create product, notify user
             return json_encode(
@@ -153,4 +171,5 @@ class ProductController
         $stmt = $product->search($name);
         return json_encode($stmt->fetchAll());
     }
+
 }

@@ -11,6 +11,7 @@ namespace App\Controller;
 use App\Config\Database;
 use App\Model\Market;
 use App\Model\MarketPrices;
+use App\Controller\UtileController;
 
 
 class MarketController
@@ -29,6 +30,7 @@ class MarketController
         $response = json_encode($stmt->fetchAll());
 
         echo $response;
+
     }
 
     public function read_all(){
@@ -54,19 +56,28 @@ class MarketController
         $market = new Market($db);
 
         //get market id to be edited
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //Save the image to the file system
+        // returns the path in which the image has been saved
+        $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
+
+        // if image not saved to file system => return error message
+        if(!$img["saved"]){
+            return json_encode(
+                array("message"=>"Unable to save market image.(create market)")
+            );
+        }
 
         //set market property values
         $market->id = $id;
-        $market->name = $data->name;
-        $market->logo = $data->logo;
-        $market->isActive = $data->isActive;
+        $market->name = $data[0]["name"];
+        $market->isActive = $data[0]["isActive"];
+        $market->logo = $img["path"];
 
         //lets create product now
-        if ($market->update()) {
-            echo json_encode(
-                array("message"=>"market was updated.")
-            );
+        if ($res = $market->update()) {
+            echo json_encode($res);
         } else { // if unable to do so
             echo json_encode(
                 array("message"=>"Unable to update market.")
@@ -84,12 +95,12 @@ class MarketController
         //query markets
 
         if($market->delete($id)) {
-            echo json_encode(
+            return json_encode(
                 array("message"=>"Market was deleted.")
             );
         }
         else { // if unable to create market, notify user
-            echo json_encode(
+            return json_encode(
                 array("message"=>"Unable to delete market.")
             );
         }
@@ -102,21 +113,30 @@ class MarketController
         $market = new Market($db);
 
         //get posted data
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        //set product property values
-        $market->name = $data->name;
-        $market->logo = $data->logo;
-        $market->isActive = $data->isActive;
+        //Save the image to the file system
+        // returns the path in which the image has been saved
+        $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
 
-        //lets create product now
-        if($market->create()) {
-            echo json_encode(
-                array("message"=>"Market was created.")
+        // if image not saved to file system => return error message
+        if(!$img["saved"]){
+            return json_encode(
+                array("message"=>"Unable to save market image.(create market)")
             );
         }
+
+        //set product property values
+        $market->name = $data[0]["name"];
+        $market->logo = $img["path"];
+        $market->isActive = $data[0]["isActive"];
+
+        //lets create product now
+        if($res = $market->create()) {
+            return  json_encode($res);
+        }
         else { // if unable to create product, notify user
-            echo json_encode(
+            return json_encode(
                 array("message"=>"Unable to create Market.")
             );
         }
