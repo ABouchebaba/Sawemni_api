@@ -45,6 +45,9 @@ $router->post("/admin/login","LoginController.adminLogin");
 
 $router->put("/products/:id", "ProductController.update");
 
+
+//$router->put("/products/image/:image", "ProductController.update");
+
 $router->put("/users/:id", "UserController.update");
 
 $router->put("/markets/:id", "MarketController.update");
