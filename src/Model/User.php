@@ -38,9 +38,26 @@ class User
         //execute query
         $stmt->execute([$id]);
         return $stmt;
-    }
+    }   
   */
+    //Get list of user prices
+    public function read_userPrices($id) {
+        //select query
+        $query = "SELECT userprices.userID, 
+                         products.PName,   
+                         userprices.price, 
+                         userprices.Localization, 
+                         userprices.created_at 
+                         from userprices 
+                         INNER join products on products.id = userprices.productID 
+                         where userID = ?";
 
+        //prepare query statement
+        $stmt = $this->conn->prepare($query);
+        //execute query
+        $stmt->execute([$id]);
+        return $stmt;
+    }
     //read all users
     public function read_all() {
         //select query
@@ -55,17 +72,16 @@ class User
     //update a user
     public function update(){
         //select query
-        $query = "UPDATE user SET canAddPrice = ? WHERE id = ?";
+
+        $query = "UPDATE users SET canAddPrice = IF (`canAddPrice`, 0, 1) WHERE id = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
 
         //sanitize
         $this->id = htmlspecialchars(strip_tags($this->id));
-        $this->canAddPrice = htmlspecialchars(strip_tags($this->canAddPrice));
 
         //execute query
         $stmt->execute([
-            $this->canAddPrice,
             $this->id
         ]);
         return $stmt;

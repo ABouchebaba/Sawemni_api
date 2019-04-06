@@ -29,6 +29,8 @@ $router->get("/markets/price/:id", "MarketController.readPrice");
 
 $router->get("/users/", "UserController.read_all");
 
+$router->get("/userprices/:id", "UserController.read_userPrices");
+
 /*************** POST  *************************************/
 
 $router->post("/products", "ProductController.create");
@@ -37,12 +39,13 @@ $router->post("/markets", "MarketController.create");
 
 $router->post("/markets/price", "MarketController.createPrice");
 
+$router->post("/admin/login","LoginController.adminLogin");
+
 /*************** PUT  *************************************/
 
 $router->put("/products/:id", "ProductController.update");
 
 $router->put("/users/:id", "UserController.update");
-
 
 $router->put("/markets/:id", "MarketController.update");
 
