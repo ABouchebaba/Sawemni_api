@@ -43,13 +43,19 @@ class Auth
 
     public function logoutAdmin($id)
     {
-    	$query = "DELETE FROM `admintoken` WHERE `admintoken`.`id` = ?";
+    	$query = "DELETE FROM `admintoken` WHERE `admintoken`.`idAdmin` = ?";
 
     	$stmt = $this->conn->prepare($query);
 
     	$id = htmlspecialchars(strip_tags($id));
 
-    	$stmt->execute([$id]);
+    	if ($stmt->execute([$id])) 
+    	{
+    		echo "admin logout successfully";
+        }
+        else {
+        	echo "error logout";
+    	}
 
         return $stmt;
 
@@ -57,43 +63,30 @@ class Auth
 
     public function getToken($id)
 	{
-		$query = "SELECT token FROM  admintoken where idAdmin = ? ;";
+		$query = "INSERT INTO `admintoken` (`idAdmin`, `token`, `created_at`) VALUES ( ?, ?, CURRENT_TIMESTAMP);";
+
+		//generate Token
+		$header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
+		$payload = json_encode(['user_id' => $id]);
+		$base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
+		$base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
+		$signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, 'abC123!', true);
+		$base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+		$token = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+
         //prepare query statement
-        $token = $this->conn->prepare($query);
+        $stmt = $this->conn->prepare($query);
 
         $id = htmlspecialchars(strip_tags($id));
+        $token = htmlspecialchars(strip_tags($token));
 
         //execute query
-        $token->execute([$id]);
-    	$result = $token->fetch();
-    	echo $result;
-        if ($result) {
-        	return $result;
-        }
-        else {
-			$header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
-			$payload = json_encode(['user_id' => $this->id]);
-			$base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
-			$base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
-			$signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, 'abC123!', true);
-			$base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-			$jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        $stmt->execute([$id,$token]);
 
-			$query2 = "INSERT INTO `admintoken` (`idAdmin`, `token`) VALUES (?, ?)";
-
-			$stmt2 = $this->conn->prepare($query2);
-
-			$id = htmlspecialchars(strip_tags($id));
-			$jwt = htmlspecialchars(strip_tags($jwt));
-	        //execute query
-	        $stmt2->execute([
-	            $id,
-	            $jwt
-	        ]);
-	        echo $jwt;
-	        return $jwt;
-			}
-			
+    	$result = $stmt->fetch();
+    	//echo $result;
+        return $token;
+		
 	}
 
 }

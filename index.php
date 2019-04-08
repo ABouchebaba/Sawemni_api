@@ -45,7 +45,6 @@ $router->post("/admin/login","LoginController.adminLogin");
 
 $router->put("/products/:id", "ProductController.update");
 
-
 //$router->put("/products/image/:image", "ProductController.update");
 
 $router->put("/users/:id", "UserController.update");
@@ -57,6 +56,8 @@ $router->put("/markets/price/", "MarketController.updatePrice");
 /*************** DEL  *************************************/
 
 $router->del("/products/:id", "ProductController.delete");
+
+$router->del("/admin/logout/:id", "LoginController.adminLogout");
 
 $router->del("/markets/:id", "MarketController.delete");
 

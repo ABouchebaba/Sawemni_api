@@ -21,16 +21,26 @@ class LoginController
         $login->password = $data->password;
 
         //query login
-        $stmt = $login->loginAdmin();
-
-        $response = $stmt->fetch();
+        $auth = $login->loginAdmin();
+        $response = $auth->fetch();
+        //echo json_encode($response);
 
         if ($response) 
         {
-        	$checkToken = $login->getToken($response['id']);
+        	$checkToken = $login->getToken($response[0]);
         	$result = json_encode(['token' => $checkToken, 'user' => $response]);
         	echo $result;
         }
 
 	}
+
+	public function adminLogout($id)
+	{
+		$database = new Database();
+        $db = $database->getConnection();
+        $auth = new Auth($db);
+
+        $logout = $auth->logoutAdmin($id);
+
+	}	
 }
