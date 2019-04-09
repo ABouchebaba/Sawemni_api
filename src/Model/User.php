@@ -61,7 +61,7 @@ class User
     //read all users
     public function read_all() {
         //select query
-        $query = "SELECT * FROM  users";
+        $query = "SELECT usersinfo.FName, usersinfo.LName, usersinfo.email, usersinfo.pseudo,usersinfo.phone, users.fb_id, users.gm_id, usersinfo.verified, usersinfo.canAddprice, users.created_at FROM usersinfo INNER JOIN users on users.id = usersinfo.idUser; ";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
         //execute query
