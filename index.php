@@ -23,9 +23,9 @@ $router->get("/markets", "MarketController.read_all");
 
 $router->get("/markets/:id", "MarketController.read");
 
-$router->get("/markets/price", "MarketController.read_allPrice");
+$router->get("/markets/prices", "MarketController.read_allPrices");
 
-$router->get("/markets/price/:id", "MarketController.readPrice");
+$router->get("/markets/prices/:id", "MarketController.readPrices");
 
 $router->get("/users/", "UserController.read_all");
 
@@ -48,11 +48,11 @@ $router->put("/products/:id", "ProductController.update");
 
 //$router->put("/products/image/:image", "ProductController.update");
 
-$router->put("/users/:id", "UserController.update");
+$router->put("/users/ban/:id", "UserController.ban");
 
 $router->put("/markets/:id", "MarketController.update");
 
-$router->put("/markets/price/", "MarketController.updatePrice");
+$router->put("/markets/prices/:id", "MarketController.updatePrices");
 
 /*************** DEL  *************************************/
 

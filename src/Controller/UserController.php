@@ -85,4 +85,23 @@ class UserController
         }
     }
 
+    public function ban($id){
+
+        //instantiate database and market object
+        $database = new Database();
+        $db = $database->getConnection();
+        $market = new User($db);
+
+        //set market property values
+        $market->id = $id;
+        //lets create product now
+        if ($res = $market->update()) {
+            return json_encode($res);
+        } else { // if unable to do so
+            return json_encode(
+                array("message"=>"Unable to update user.")
+            );
+        }
+    }
+
 }

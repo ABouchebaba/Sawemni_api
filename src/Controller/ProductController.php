@@ -116,17 +116,22 @@ class ProductController
         //get posted data
         $data = json_decode(file_get_contents("php://input"), true);
 
-        //Save the image to the file system
-        // returns the path in which the image has been saved
-        $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
+        $img = [];
+        if (isset($data[1]["base64"])) {
 
-        // if image not saved to file system => return error message
-        if(!$img["saved"]){
-            return json_encode(
-                array("message"=>"Unable to save product image.(create product)")
-            );
+            //Save the image to the file system
+            // returns the path in which the image has been saved
+            $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
+
+            // if image not saved to file system => return error message
+            if (!$img["saved"]) {
+                return json_encode(
+                    array("message" => "Unable to save product image.(create product)")
+                );
+            }
+        } else {
+            $img["path"] = "Public/Images/Product/default.jpg";
         }
-
         //set product property values
         $product->name = $data[0]["PName"];
         $product->category = $data[0]["category"];
@@ -171,5 +176,7 @@ class ProductController
         $stmt = $product->search($name);
         return json_encode($stmt->fetchAll());
     }
+
+
 
 }

@@ -115,15 +115,21 @@ class MarketController
         //get posted data
         $data = json_decode(file_get_contents("php://input"), true);
 
-        //Save the image to the file system
-        // returns the path in which the image has been saved
-        $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
+        $img = [];
+        if (isset($data[1]["base64"])) {
 
-        // if image not saved to file system => return error message
-        if(!$img["saved"]){
-            return json_encode(
-                array("message"=>"Unable to save market image.(create market)")
-            );
+            //Save the image to the file system
+            // returns the path in which the image has been saved
+            $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
+
+            // if image not saved to file system => return error message
+            if (!$img["saved"]) {
+                return json_encode(
+                    array("message" => "Unable to save market image.(create market)")
+                );
+            }
+        } else {
+            $img["path"] = "Public/Images/Market/default.jpg";
         }
 
         //set product property values
@@ -143,7 +149,7 @@ class MarketController
     }
 
     //--------PRICES----------------------//
-    public function readPrice($id){
+    public function readPrices($productID){
 
         //instantiate database and market object
         $database = new Database();
@@ -151,11 +157,8 @@ class MarketController
         $marketprice = new MarketPrices($db);
 
         //query markets
-        $stmt = $marketprice->read($id);
-
-        $response = json_encode($stmt->fetchAll());
-
-        echo $response;
+        //var_dump($marketprice->read($productID));
+        return  json_encode($marketprice->read($productID));
     }
 
     public function read_allPrice(){
@@ -174,7 +177,7 @@ class MarketController
         echo $response;
     }
 
-    public function updatePrice(){
+    public function updatePrices($product_id){
 
         //instantiate database and market object
         $database = new Database();
@@ -182,19 +185,16 @@ class MarketController
         $marketprice = new MarketPrices($db);
 
         //get market id to be edited
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
 
+        //return (json_encode($data));
         //set market property values
-        $marketprice->id = $data->id;
-        $marketprice->partnerID = $data->partnerID;
-        $marketprice->productID = $data->productID;
-        $marketprice->price = $data->price;
+        $marketprice->productID = $product_id;
+        $marketprice->prices = $data;
 
         //lets create product now
-        if ($marketprice->update()) {
-            echo json_encode(
-                array("message"=>"marketprice was updated.")
-            );
+        if ($res = $marketprice->update()) {
+            return json_encode($res);
         } else { // if unable to do so
             echo json_encode(
                 array("message"=>"Unable to update marketprice.")
@@ -202,7 +202,7 @@ class MarketController
         }
     }
 
-    public function deletePrice($id){
+    public function deletePrices($id){
 
         //instantiate database and market object
         $database = new Database();
@@ -212,12 +212,12 @@ class MarketController
         //query markets
 
         if($marketprice->delete($id)) {
-            echo json_encode(
+            return json_encode(
                 array("message"=>"marketprice was deleted.")
             );
         }
         else { // if unable to create market, notify user
-            echo json_encode(
+            return json_encode(
                 array("message"=>"Unable to delete marketprice.")
             );
         }

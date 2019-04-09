@@ -72,7 +72,6 @@ class User
     //update a user
     public function update(){
         //select query
-
         $query = "UPDATE users SET canAddPrice = IF (`canAddPrice`, 0, 1) WHERE id = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
@@ -85,5 +84,33 @@ class User
             $this->id
         ]);
         return $stmt;
+    }
+
+    //update a user
+    public function ban(){
+        //select query
+        $query = "UPDATE users SET canAddPrice = IF (`canAddPrice`, 0, 1) WHERE id = ?";
+        //prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        //sanitize
+        $this->id = htmlspecialchars(strip_tags($this->id));
+
+        //execute query
+        $stmt->execute([
+            $this->id
+        ]);
+
+        $query = "SELECT * FROM users where id = ?";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([$this->id]);
+        $res = $stmt->fetch();
+
+        return array(
+
+        );
+
     }
 }

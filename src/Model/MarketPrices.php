@@ -18,6 +18,7 @@ class MarketPrices
     public $partnerID;
     public $productID;
     public $price;
+    public $prices = [];
 
     //constructor with $db as Database Connection
     public function __construct($db) {
@@ -27,12 +28,18 @@ class MarketPrices
     //read one product
     public function read($id) {
         //select query
-        $query = "SELECT * FROM  marketprices WHERE id = ?";
+        $query = "SELECT name , price, m.id 
+                  FROM markets m 
+                  LEFT JOIN (
+                    SELECT * FROM marketprices where productID = ?
+                  ) mp
+                  ON m.id = mp.partnerID ;";
+
         //prepare query statement
         $stmt = $this->conn->prepare($query);
         //execute query
         $stmt->execute([$id]);
-        return $stmt;
+        return $stmt->fetchAll();
     }
 
     //read all products
@@ -79,20 +86,26 @@ class MarketPrices
     //update a product
     public function update(){
         //select query
-        $query = "UPDATE marketprices SET partnerID = ?, productID = ?, price = ? WHERE id = ?";
+        $query = "DELETE FROM marketPrices WHERE productID = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
 
         //sanitize
-        $this->partnerID = htmlspecialchars(strip_tags($this->partnerID));
+        //$this->partnerID = htmlspecialchars(strip_tags($this->partnerID));
         $this->productID = htmlspecialchars(strip_tags($this->productID));
-        $this->price = htmlspecialchars(strip_tags($this->price));
-
+//        $this->prices = htmlspecialchars(strip_tags($this->prices));
         //execute query
-        $stmt->execute([$this->partnerID,
-            $this->productID,
-            $this->price,
-            $this->id]);
-        return $stmt;
+        $stmt->execute([$this->productID]);
+
+        $query = "INSERT INTO marketPrices (partnerID, productID, price)
+                  VALUES (?, ?, ?) ";
+
+        $stmt = $this->conn->prepare($query);
+
+        foreach($this->prices as $mp){
+            $stmt->execute([$mp["id"], $this->productID, $mp["price"]]);
+        }
+
+        return $this->prices;
     }
 }
