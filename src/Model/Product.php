@@ -47,7 +47,8 @@ class Product
         $stmt = $this->conn->prepare($query);
         //execute query
         $stmt->execute();
-        return $stmt;
+
+        return $stmt->fetchAll();
     }
 
     //create a product
@@ -117,7 +118,7 @@ class Product
                   `description` = ?,
                   `RefPrice` = ?,
                   `updated_at` = CURRENT_TIMESTAMP,
-                  `imgURL` = ? 
+                  `imgURL` = IFNULL(?, `imgURL`) 
                   WHERE `products`.`id` = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
@@ -132,6 +133,7 @@ class Product
         $this->imgURL = htmlspecialchars(strip_tags($this->imgURL));
         $this->price = htmlspecialchars(strip_tags($this->price));
 
+        $this->imgURL = ($this->imgURL === '')?null : $this->imgURL;
         //execute query
         $stmt->execute([
             $this->name,
@@ -144,16 +146,16 @@ class Product
             $this->id
         ]);
 
-        return array(
-            "id" => $this->id,
-            "PName" => $this->name,
-            "category" => $this->category,
-            "barcode" => $this->barcode,
-            "producer" => $this->producer,
-            "description" => $this->description,
-            "RefPrice" => $this->price,
-            "imgURL" => $this->imgURL
-        );
+        // get the product info back from the db
+
+        $query = "SELECT * FROM products where id = ?";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([$this->id]);
+
+        return $stmt->fetch();
+
     }
 
     public function barcode($barcode) {

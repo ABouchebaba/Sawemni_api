@@ -40,9 +40,9 @@ class ProductController
         $product = new Product($db);
 
         //query products
-        $stmt = $product->read_all();
+        $res = $product->read_all();
 
-        return json_encode($stmt->fetchAll());
+        return json_encode($res);
 
     }
 
@@ -56,17 +56,22 @@ class ProductController
         //get product id to be edited
         $data = json_decode(file_get_contents("php://input"), true);
 
-        //Save the image to the file system
-        // returns the path in which the image has been saved
-        $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
+        $img = [];
+        if (!is_null($data[1]) ) {
+            //Save the image to the file system
+            // returns the path in which the image has been saved
+            $img = UtileController::saveImage("Public/Images/Product", $data[1]["base64"]);
 
-        // if image not saved to file system => return error message
-        if(!$img["saved"]){
-            return json_encode(
-                array("message"=>"Unable to save product image.(update product)")
-            );
+            // if image not saved to file system => return error message
+            if (!$img["saved"]) {
+                return json_encode(
+                    array("message" => "Unable to save product image.(update product)")
+                );
+            }
         }
-
+        else {
+            $img["path"] = null;
+        }
         //set product property values
         $product->id = $id;
         $product->name = $data[0]["PName"];
@@ -96,7 +101,7 @@ class ProductController
 
         if($product->delete($id)) {
             return json_encode(
-                array("message"=>"Product was deleted.")
+                ["id" => $id]
             );
         }
         else { // if unable to delete product, notify user
@@ -130,7 +135,7 @@ class ProductController
                 );
             }
         } else {
-            $img["path"] = "Public/Images/Product/default.jpg";
+            $img["path"] = "";
         }
         //set product property values
         $product->name = $data[0]["PName"];
@@ -162,7 +167,7 @@ class ProductController
         //query products
         $stmt = $product->barcode($barcode);
 
-        return json_encode($stmt->fetchAll());
+        return json_encode($stmt->fetchAll()[0]);
     }
 
     public function search($name){

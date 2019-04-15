@@ -41,11 +41,9 @@ class MarketController
         $market = new Market($db);
 
         //query market
-        $stmt = $market->read_all();
+        $res = $market->read_all();
 
-        $response = json_encode($stmt->fetchAll());
-
-        echo $response;
+        return json_encode($res);
     }
 
     public function update($id){
@@ -58,17 +56,25 @@ class MarketController
         //get market id to be edited
         $data = json_decode(file_get_contents("php://input"), true);
 
-        //Save the image to the file system
-        // returns the path in which the image has been saved
-        $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
+        $img = [];
+        if (!is_null($data[1])) {
+            //Save the image to the file system
+            // returns the path in which the image has been saved
+            $img = UtileController::saveImage("Public/Images/Market", $data[1]["base64"]);
 
-        // if image not saved to file system => return error message
-        if(!$img["saved"]){
-            return json_encode(
-                array("message"=>"Unable to save market image.(create market)")
-            );
+            // if image not saved to file system => return error message
+            if (!$img["saved"]) {
+                return json_encode(
+                    array("message" => "Unable to save market image.(create market)")
+                );
+            }
+
+        }
+        else {
+            $img["path"] = null;
         }
 
+        //var_dump($img);
         //set market property values
         $market->id = $id;
         $market->name = $data[0]["name"];
@@ -77,9 +83,9 @@ class MarketController
 
         //lets create product now
         if ($res = $market->update()) {
-            echo json_encode($res);
+            return json_encode($res);
         } else { // if unable to do so
-            echo json_encode(
+            return json_encode(
                 array("message"=>"Unable to update market.")
             );
         }

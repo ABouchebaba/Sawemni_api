@@ -43,7 +43,8 @@ class Market
         $stmt = $this->conn->prepare($query);
         //execute query
         $stmt->execute();
-        return $stmt;
+
+        return $stmt->fetchAll();
     }
 
     //create a product
@@ -77,8 +78,6 @@ class Market
             "logo" => $this->logo,
             "isActive" => $this->isActive
         );
-
-
     }
 
     //delete a product
@@ -95,7 +94,11 @@ class Market
     //update a product
     public function update(){
         //select query
-        $query = "UPDATE markets SET name = ?, Logo = ?, isActive = ? WHERE id = ?";
+        $query = "UPDATE markets 
+                  SET name = ?,   
+                  Logo = IFNULL(?, Logo), 
+                  isActive = ? 
+                  WHERE id = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
 
@@ -105,6 +108,7 @@ class Market
         $this->logo = htmlspecialchars(strip_tags($this->logo));
         $this->isActive = htmlspecialchars(strip_tags($this->isActive));
 
+        $this->logo = ($this->logo === '')?null : $this->logo;
         //execute query
         $stmt->execute([
             $this->name,
@@ -113,11 +117,14 @@ class Market
             $this->id
         ]);
 
-        return array(
-            "id" => $this->id,
-            "name" => $this->name,
-            "logo" => $this->logo,
-            "isActive" => $this->isActive
-        );
+        // get the product info back from the db
+
+        $query = "SELECT * FROM markets where id = ?";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([$this->id]);
+
+        return $stmt->fetch();
     }
 }
