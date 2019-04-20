@@ -42,5 +42,36 @@ class LoginController
 
         $logout = $auth->logoutAdmin($id);
 
-	}	
+	}
+
+	public function userSignup(){
+
+        //instantiate database and market object
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //print_r($data["mail"]);
+        $login->email = filter_var($data["mail"], FILTER_SANITIZE_EMAIL);
+        $login->password = filter_var($data["password"], FILTER_SANITIZE_STRING);
+        $login->fullName = filter_var($data["fullName"], FILTER_SANITIZE_STRING);
+
+        //echo($login->email);
+        // add user to DB
+        $user = $login->userSignup();
+
+        //print_r($user);
+
+        $token = $login->getUserToken($user["id"]);
+
+
+        return json_encode([
+            "user" => $user,
+            "token" => $token
+        ]);
+
+
+    }
 }

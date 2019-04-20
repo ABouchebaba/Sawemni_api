@@ -11,8 +11,8 @@ $router = new App\Router\Router($_GET["url"]);
 
 /***********  GET  ********************************************/
 
-$router->get("/products", "ProductController.read_all")
-        ->middleware(["AuthMiddleware.adminCheckToken"]);
+$router->get("/products", "ProductController.read_all");
+        //->middleware(["AuthMiddleware.adminCheckToken"]);
 
 $router->get("/products/:id", "ProductController.read");
 
@@ -46,6 +46,9 @@ $router->post("/markets/price", "MarketController.createPrice")
         ->middleware(["AuthMiddleware.adminCheckToken"]);
 
 $router->post("/admin/login","LoginController.adminLogin");
+
+$router->post("/users/signup","LoginController.userSignup")
+        ->middleware(["AuthMiddleware.userCheckMailExists"]);
 
 /*************** PUT  *************************************/
 
