@@ -36,7 +36,11 @@ class Product
         $stmt = $this->conn->prepare($query);
         //execute query
         $stmt->execute([$id]);
-        return $stmt;
+        $res = ["product" => $stmt->fetch()];
+
+        // get prices and put them in $res
+
+        return $res;
     }
 
     //read all products
@@ -158,23 +162,41 @@ class Product
 
     }
 
-    public function barcode($barcode) {
+    public function barcode() {
         //select query
         $query = "SELECT * FROM  products WHERE barcode = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
         //execute query
-        $stmt->execute([$barcode]);
-        return $stmt;
-    }
+        $stmt->execute([$this->barcode]);
 
-    public function search($name) {
-        //select query
-        $query = "SELECT * FROM  products WHERE products.PName like ?";
+        $res = ["product" => $stmt->fetch()];
+
+        $this->id = $res["product"]["id"];
+        $query = "SELECT m.id, m.name, m.Logo, mp.price 
+                  FROM marketprices mp
+                  JOIN markets m 
+                  ON  m.id = mp.partnerID
+                  where productID = ?";
         //prepare query statement
         $stmt = $this->conn->prepare($query);
         //execute query
-        $stmt->execute(['%'.$name.'%']);
-        return $stmt;
+        $stmt->execute([$this->id]);
+
+        $res["prices"] = $stmt->fetchAll();
+
+        return $res;
     }
+
+    public function search() {
+        //select query
+        $query = "SELECT * FROM  products";
+        //prepare query statement
+        $stmt = $this->conn->prepare($query);
+        //execute query
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+
 }

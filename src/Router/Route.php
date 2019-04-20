@@ -16,6 +16,7 @@ class Route
     private $callable;
     private $matches = [];
     private $params = [];
+    private $middlewares = [];
 
     public function __construct($path, $callable)
     {
@@ -53,8 +54,22 @@ class Route
         return $this;
     }
 
+    public function middleware($middlewares){
+
+        //$this->middlewares[] = $middleware;
+        foreach ($middlewares as $m){
+            $this->middlewares[] = $m;
+        }
+        return $this;
+    }
+
     public function call(){
 
+        // call middlewares before calling the controller methods
+        $pass = $this->callMiddlewares();
+        if ($pass !== true) return json_encode($pass);
+
+        // if middlewares passed call controller methods
         if (is_string($this->callable)){
 
             $params = explode(".", $this->callable);
@@ -66,5 +81,25 @@ class Route
 
         }
         return call_user_func_array($this->callable, $this->matches);
+    }
+
+    private function callMiddlewares(){
+
+        foreach ($this->middlewares as $middleware ){
+            $params = explode(".", $middleware);
+
+            $controller = "App\Middleware\\". $params[0];
+            $controller = new $controller();
+
+            $res =  call_user_func_array([$controller, $params[1]], $this->matches);
+
+
+            if($res !== true) {
+                return $res;
+            }
+
+        }
+        return true;
+
     }
 }

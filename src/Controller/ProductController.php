@@ -27,9 +27,10 @@ class ProductController
         $product = new Product($db);
 
         //query products
-        $stmt = $product->read($id);
+        $res = $product->read($id);
 
-        return json_encode($stmt->fetchAll());
+
+        return json_encode($res);
     }
 
     public function read_all(){
@@ -41,7 +42,7 @@ class ProductController
 
         //query products
         $res = $product->read_all();
-
+        //$res["header"] = apache_request_headers()["Authorization"];
         return json_encode($res);
 
     }
@@ -164,13 +165,14 @@ class ProductController
         $db = $database->getConnection();
         $product = new Product($db);
 
+        $product->barcode = $barcode;
         //query products
-        $stmt = $product->barcode($barcode);
+        $res = $product->barcode();
 
-        return json_encode($stmt->fetchAll()[0]);
+        return json_encode($res);
     }
 
-    public function search($name){
+    public function search(){
 
         //instantiate database and product object
         $database = new Database();
@@ -178,8 +180,8 @@ class ProductController
         $product = new Product($db);
 
         //query products
-        $stmt = $product->search($name);
-        return json_encode($stmt->fetchAll());
+        $res = $product->search();
+        return json_encode($res);
     }
 
 
