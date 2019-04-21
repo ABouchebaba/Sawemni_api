@@ -8,8 +8,7 @@ use App\Model\Auth;
 
 class LoginController
 {
-	public function adminLogin()
-	{
+	public function adminLogin(){
 		//instantiate database and market object
         $database = new Database();
         $db = $database->getConnection();
@@ -31,17 +30,15 @@ class LoginController
         	$result = json_encode(['token' => $checkToken, 'user' => $response]);
         	echo $result;
         }
-
 	}
 
-	public function adminLogout($id)
-	{
+	public function adminLogout($id){
+
 		$database = new Database();
         $db = $database->getConnection();
         $auth = new Auth($db);
 
         $logout = $auth->logoutAdmin($id);
-
 	}
 
 	public function userSignup(){
@@ -71,7 +68,31 @@ class LoginController
             "user" => $user,
             "token" => $token
         ]);
+    }
 
+    public function userSignupFB(){
+        
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
 
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //print_r($data["mail"]);
+        $login->fb_id = filter_var($data["fb_id"], FILTER_SANITIZE_EMAIL);
+        $login->fullName = filter_var($data["fullName"], FILTER_SANITIZE_STRING);
+
+        //echo($login->email);
+        // add user to DB
+        $user = $login->userSignupFB();
+
+        //print_r($user);
+        $token = $login->getUserToken($user["id"]);
+        
+
+        return json_encode([
+            "user" => $user,
+            "token" => $token
+        ]);
     }
 }

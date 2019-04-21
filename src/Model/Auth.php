@@ -89,8 +89,7 @@ class Auth
         ];
     }
 
-    public function getToken($id)
-	{
+    public function getToken($id){
 		$query = "INSERT INTO `admintoken` (`idAdmin`, `token`, `created_at`) VALUES ( ?, ?, CURRENT_TIMESTAMP);";
 
 		//generate Token
@@ -114,11 +113,10 @@ class Auth
     	$result = $stmt->fetch();
     	//echo $result;
         return $token;
-		
 	}
 
-    public function getUserToken($id)
-    {
+    public function getUserToken($id){
+
         $query = "INSERT INTO `userstoken` (`user_id`, `token`) VALUES ( ?, ?);";
 
         //generate Token
@@ -139,10 +137,52 @@ class Auth
         //execute query
         $stmt->execute([$id, $token]);
 
-//        $result = $stmt->fetch();
-//        print_r( "result " . $result);
+        //$result = $stmt->fetch();
+        //print_r( "result " . $result);
         return $token;
+    }
 
+    public function userSignupFB(){
+
+        $checkQuery= "SELECT * FROM usersinfo where pseudo= (?)";
+        $stmtCheck = $this->conn->prepare($checkQuery);
+        $stmtCheck->execute([$this->fb_id]);
+        $result = $stmtCheck->fetch();
+
+        if($result) {
+
+            $query = "DELETE FROM userstoken where user_id = (?)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$result["idUser"]]); //    <- hadi !!!!!
+
+            return [
+                "id" => $result["idUser"],    //    <- hadi !!!!!
+                "fullName" => $this->fullName   //    <- hadi !!!!!
+                ];
+        }
+        else
+        {
+            $query = "INSERT INTO users (fb_id) VALUES( ? )";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([ $this->fb_id]);
+            $id = $this->conn->lastInsertId();
+
+            $query = "INSERT INTO `usersinfo` 
+                      ( `idUser`, `FName`,`pseudo`, `verified`, `canAddprice`) 
+                      VALUES ( ?, ?, ?, 1, 1);";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                $id, 
+                $this->fullName, 
+                $this->fb_id
+                ]);
+
+            return [
+                "id" => $id,
+                "fullName" => $this->fullName
+                ];
+        }
     }
 
 }

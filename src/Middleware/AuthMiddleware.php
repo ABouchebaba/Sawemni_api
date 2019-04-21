@@ -94,4 +94,35 @@ class AuthMiddleware
         return ["message" => "EMail already exists"];
     }
 
+    public function userCheckFBExists(){
+        //instantiate database and market object
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $fb_id = filter_var($data["fb_id"], FILTER_SANITIZE_EMAIL);
+
+        $db = new Database();
+        $db = $db->getConnection();
+
+        $query = "SELECT * FROM usersinfo WHERE pseudo = ? ";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->execute([$fb_id]);
+        $res = $stmt->fetchAll();
+
+        if (count($res) !== 0){
+            
+        }
+        else if(count($res) !== 0){
+
+        }
+
+        http_response_code(400);
+        return ["message" => "EMail already exists"];
+    }
+
 }

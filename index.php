@@ -52,6 +52,8 @@ $router->post("/admin/login","LoginController.adminLogin");
 $router->post("/users/signup","LoginController.userSignup")
         ->middleware(["AuthMiddleware.userCheckMailExists"]);
 
+$router->post("/users/signupFB","LoginController.userSignupFB");
+
 $router->post("/users/addPrice", "UserController.addUserPrice")
         ->middleware(["AuthMiddleware.userCheckToken"]);
 
