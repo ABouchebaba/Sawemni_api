@@ -43,10 +43,11 @@ class AuthMiddleware
     public function userCheckToken(){
         $headers = apache_request_headers();
 
-        if (!isset($headers["Authorization"])){
+
+        if (!isset($headers["authorization"])){
             return ["message" => "Access denied"];
         }
-        $token = $headers["Authorization"];
+        $token = $headers["authorization"];
 
         $db = new Database();
         $db = $db->getConnection();

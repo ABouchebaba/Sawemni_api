@@ -16,9 +16,11 @@ $router->get("/products", "ProductController.read_all");
 
 $router->get("/products/:id", "ProductController.read");
 
-$router->get("/products/barcode/:barcode", "ProductController.barcode");
+$router->get("/products/barcode/:barcode", "ProductController.barcode")
+    ->middleware(["AuthMiddleware.userCheckToken"]);
 
-$router->get("/products/name", "ProductController.search");
+$router->get("/products/name", "ProductController.search")
+    ->middleware(["AuthMiddleware.userCheckToken"]);
 
 $router->get("/markets", "MarketController.read_all")
         ->middleware(["AuthMiddleware.adminCheckToken"]);
@@ -49,6 +51,9 @@ $router->post("/admin/login","LoginController.adminLogin");
 
 $router->post("/users/signup","LoginController.userSignup")
         ->middleware(["AuthMiddleware.userCheckMailExists"]);
+
+$router->post("/users/addPrice", "UserController.addUserPrice")
+        ->middleware(["AuthMiddleware.userCheckToken"]);
 
 /*************** PUT  *************************************/
 

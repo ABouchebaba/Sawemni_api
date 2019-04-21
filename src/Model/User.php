@@ -14,6 +14,8 @@ class User
     //Database connection
     private $conn;
     public $id;
+    public $added_price;
+    public $product_id;
   /* 
     public $pseudo  
     public $FName   
@@ -67,6 +69,24 @@ class User
         //execute query
         $stmt->execute();
         return $stmt;
+    }
+
+    public function addUserPrice(){
+
+        $query = "INSERT INTO userPrices (userID, productID, price) VALUES(?,?,?)";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([$this->id, $this->product_id, $this->added_price]);
+
+        $id = $this->conn->lastInsertId();
+
+        return [
+            "id" => $id,
+            "userID" => $this->id,
+            "productID" => $this->product_id,
+            "price" => $this->added_price,
+        ];
     }
 
     //update a user

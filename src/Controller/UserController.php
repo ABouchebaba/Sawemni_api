@@ -104,4 +104,24 @@ class UserController
         }
     }
 
+    public function addUserPrice(){
+
+        //instantiate database and market object
+        $database = new Database();
+        $db = $database->getConnection();
+        $user = new User($db);
+
+        //get market id to be edited
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $user->id = filter_var($data["user_id"], FILTER_SANITIZE_NUMBER_INT);
+        $user->product_id = filter_var($data["product_id"], FILTER_SANITIZE_NUMBER_INT);
+        $user->added_price = filter_var($data["price"], FILTER_SANITIZE_NUMBER_FLOAT);
+
+        $res = $user->addUserPrice();
+
+        return json_encode($res);
+
+    }
+
 }
