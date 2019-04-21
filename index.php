@@ -49,6 +49,9 @@ $router->post("/markets/price", "MarketController.createPrice")
 
 $router->post("/admin/login","LoginController.adminLogin");
 
+$router->post("/users/login","LoginController.userLogin");
+
+
 $router->post("/users/signup","LoginController.userSignup")
         ->middleware(["AuthMiddleware.userCheckMailExists"]);
 
@@ -88,7 +91,7 @@ $router->del("/markets/price/:id", "MarketController.deletePrice")
 /**************************************************************/
 
 try {
-    http_response_code(200);
+    //http_response_code(200);
     echo $router->run();
 }
 catch(Exception $e){
