@@ -95,4 +95,38 @@ class LoginController
             "token" => $token
         ]);
     }
+
+    public function userLogin(){
+        //instantiate database and market object
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $login->email = filter_var($data["mail"], FILTER_SANITIZE_EMAIL);
+        $login->password = filter_var($data["password"], FILTER_SANITIZE_STRING);
+
+        $res = $login->userLogin();
+
+        // if error return message
+        if (isset($res["message"])){
+            http_response_code(400);
+
+            exit();
+        }
+
+        // there is no error
+        http_response_code(200);
+
+        if (isset($res["token"])){
+            return json_encode($res);
+        }
+
+        $token = $login->getUserToken($res["user"]["id"]);
+
+        $res["token"] = $token;
+
+        return json_encode($res);
+    }
 }
