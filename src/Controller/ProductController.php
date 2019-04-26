@@ -168,6 +168,11 @@ class ProductController
         $product->barcode = $barcode;
         //query products
         $res = $product->barcode();
+        if (isset($res["message"])) {
+            http_response_code(400);
+            exit($res);
+        }
+
 
         return json_encode($res);
     }

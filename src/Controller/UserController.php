@@ -51,10 +51,10 @@ class UserController
         //instantiate database and market object
         $database = new Database();
         $db = $database->getConnection();
-        $market = new User($db);
+        $user = new User($db);
 
-        //query market
-        $stmt = $market->read_all();
+        //query user
+        $stmt = $user->read_all();
 
         $response = json_encode($stmt->fetchAll());
 
@@ -66,15 +66,15 @@ class UserController
         //instantiate database and market object
         $database = new Database();
         $db = $database->getConnection();
-        $market = new User($db);
+        $user = new User($db);
 
-        //get market id to be edited
+        //get user id to be edited
         //$data = json_decode(file_get_contents("php://input"));
 
-        //set market property values
-        $market->id = $id;
+        //set user property values
+        $user->id = $id;
         //lets create product now
-        if ($market->update()) {
+        if ($user->update()) {
             echo json_encode(
                 array("message"=>"User was updated.")
             );

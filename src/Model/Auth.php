@@ -41,7 +41,8 @@ class Auth
         return $stmt;
     }
 
-    public function logoutAdmin($id)
+    public function logoutAdmin($id){
+        
     	$query = "DELETE FROM `admintoken` WHERE `admintoken`.`idAdmin` = ?";
 
     	$stmt = $this->conn->prepare($query);
@@ -209,6 +210,50 @@ class Auth
                 $id, 
                 $this->fullName, 
                 $this->fb_id
+                ]);
+
+            return [
+                "id" => $id,
+                "fullName" => $this->fullName
+                ];
+        }
+    }
+
+    public function userSignupGoogle(){
+
+        $checkQuery= "SELECT * FROM usersinfo where pseudo= (?)";
+        $stmtCheck = $this->conn->prepare($checkQuery);
+        $stmtCheck->execute([$this->gm_id]);
+        $result = $stmtCheck->fetch();
+
+        if($result) {
+
+            $query = "DELETE FROM userstoken where user_id = (?)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$result["idUser"]]); //    <- hadi !!!!!
+
+            return [
+                "id" => $result["idUser"],    //    <- hadi !!!!!
+                "fullName" => $this->fullName   //    <- hadi !!!!!
+                ];
+        }
+        else
+        {
+            $query = "INSERT INTO users (gm_id) VALUES( ? )";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([ $this->gm_id]);
+            $id = $this->conn->lastInsertId();
+
+            $query = "INSERT INTO `usersinfo` 
+                      ( `idUser`, `FName`,`email`, `pseudo`, `verified`, `canAddprice`) 
+                      VALUES ( ?, ?, ?, ?, 1, 1);";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                $id, 
+                $this->fullName, 
+                $this->email,
+                $this->gm_id
                 ]);
 
             return [

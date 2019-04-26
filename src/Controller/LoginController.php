@@ -79,12 +79,39 @@ class LoginController
         $data = json_decode(file_get_contents("php://input"), true);
 
         //print_r($data["mail"]);
-        $login->fb_id = filter_var($data["fb_id"], FILTER_SANITIZE_EMAIL);
-        $login->fullName = filter_var($data["fullName"], FILTER_SANITIZE_STRING);
+        $login->fb_id = filter_var($data["id"], FILTER_SANITIZE_EMAIL);
+        $login->fullName = filter_var($data["name"], FILTER_SANITIZE_STRING);
 
         //echo($login->email);
         // add user to DB
         $user = $login->userSignupFB();
+
+        //print_r($user);
+        $token = $login->getUserToken($user["id"]);
+        
+
+        return json_encode([
+            "user" => $user,
+            "token" => $token
+        ]);
+    }
+
+    public function userSignupGoogle(){
+        
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        //print_r($data["mail"]);
+        $login->gm_id = filter_var($data["uid"], FILTER_SANITIZE_EMAIL);
+        $login->fullName = filter_var($data["displayName"], FILTER_SANITIZE_STRING);
+        $login->email = filter_var($data["email"], FILTER_SANITIZE_STRING);
+
+        //echo($login->email);
+        // add user to DB
+        $user = $login->userSignupGoogle();
 
         //print_r($user);
         $token = $login->getUserToken($user["id"]);

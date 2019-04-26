@@ -6,13 +6,16 @@ header("Access-Control-Allow-Methods: POST, GET, DELETE, PUT, OPTIONS");
 
 require "vendor/autoload.php";
 
-
 $router = new App\Router\Router($_GET["url"]);
 
 /***********  GET  ********************************************/
 
-$router->get("/products", "ProductController.read_all");
-        //->middleware(["AuthMiddleware.adminCheckToken"]);
+$router->get("/products", "ProductController.read_all")
+    ->middleware(["AuthMiddleware.adminCheckToken"]);
+
+$router->get("/userProducts", "ProductController.read_all")
+   ->middleware(["AuthMiddleware.userCheckToken"]);
+
 
 $router->get("/products/:id", "ProductController.read");
 
@@ -56,6 +59,8 @@ $router->post("/users/signup","LoginController.userSignup")
         ->middleware(["AuthMiddleware.userCheckMailExists"]);
 
 $router->post("/users/signupFB","LoginController.userSignupFB");
+
+$router->post("/users/signupGoogle","LoginController.userSignupGoogle");
 
 $router->post("/users/addPrice", "UserController.addUserPrice")
         ->middleware(["AuthMiddleware.userCheckToken"]);

@@ -170,7 +170,13 @@ class Product
         //execute query
         $stmt->execute([$this->barcode]);
 
-        $res = ["product" => $stmt->fetch()];
+        $res= $stmt->fetchAll();
+
+        if(count($res) !== 1 ) {
+            return ["message" => "Produit indisponible"];
+        } 
+
+        $res = ["product" => $res[0]];
 
         $this->id = $res["product"]["id"];
         $query = "SELECT m.id, m.name, m.Logo, mp.price 
