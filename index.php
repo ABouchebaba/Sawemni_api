@@ -39,6 +39,8 @@ $router->get("/users/", "UserController.read_all")
 
 $router->get("/userprices/:id", "UserController.read_userPrices");
 
+$router->get("/mailVerification/:id", "LoginController.verifyMail");
+
 /*************** POST  *************************************/
 
 $router->post("/products", "ProductController.create")
@@ -56,7 +58,7 @@ $router->post("/users/login","LoginController.userLogin");
 
 
 $router->post("/users/signup","LoginController.userSignup")
-        ->middleware(["AuthMiddleware.userCheckMailExists"]);
+        ;//->middleware(["AuthMiddleware.userCheckMailExists"]);
 
 $router->post("/users/signupFB","LoginController.userSignupFB");
 

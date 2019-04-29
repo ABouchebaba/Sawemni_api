@@ -1,15 +1,17 @@
-<?php 
+<?php
 
 namespace App\Controller;
 
 use App\Config\Database;
 use App\Model\Auth;
+use App\Controller\UtileController;
 
 
 class LoginController
 {
-	public function adminLogin(){
-		//instantiate database and market object
+    public function adminLogin()
+    {
+        //instantiate database and market object
         $database = new Database();
         $db = $database->getConnection();
         $login = new Auth($db);
@@ -24,24 +26,25 @@ class LoginController
         $response = $auth->fetch();
         //echo json_encode($response);
 
-        if ($response) 
-        {
-        	$checkToken = $login->getToken($response[0]);
-        	$result = json_encode(['token' => $checkToken, 'user' => $response]);
-        	echo $result;
+        if ($response) {
+            $checkToken = $login->getToken($response[0]);
+            $result = json_encode(['token' => $checkToken, 'user' => $response]);
+            echo $result;
         }
-	}
+    }
 
-	public function adminLogout($id){
+    public function adminLogout($id)
+    {
 
-		$database = new Database();
+        $database = new Database();
         $db = $database->getConnection();
         $auth = new Auth($db);
 
         $logout = $auth->logoutAdmin($id);
-	}
+    }
 
-	public function userSignup(){
+    public function userSignup()
+    {
 
         //instantiate database and market object
         $database = new Database();
@@ -59,19 +62,62 @@ class LoginController
         // add user to DB
         $user = $login->userSignup();
 
-        //print_r($user);
+        $cryptedID = md5($user["id"]);
+        $verficationLink = "https://503ff796.ngrok.io/sawemni_api/mailVerification/$cryptedID";
+        $subject = "Vérification";
 
-        $token = $login->getUserToken($user["id"]);
+        $content = "<div>
+                        Bonjour/Bonsoir,<br>
+                        Veuillez accéder au lien ci-dessous pour vérifier votre adresse mail. 
+                        
+                        <a href='http://sawemli.com/back/' >Vérifier votre adresse mail</a>
+                        <br><br>
+                        Pour plus d'informations, veuillez contacter l'admin sur cette adresse <a href='admin@sawemli.com'>@Admin</a>
+                    </div>";
 
+        UtileController::sendMail($login->fullName, $login->email, $subject, $content);
 
         return json_encode([
-            "user" => $user,
-            "token" => $token
+            "message" => "Un lien de vérification a été envoyé à l'adresse fournie, veuillez consulter votre boite de réception"
         ]);
+
+        //print_r($user);
+
+//        $token = $login->getUserToken($user["id"]);
+//
+//
+//        return json_encode([
+//            "user" => $user,
+//            "token" => $token
+//        ]);
     }
 
-    public function userSignupFB(){
-        
+    public function verifyMail($id)
+    {
+
+        $database = new Database();
+        $db = $database->getConnection();
+        $login = new Auth($db);
+
+//        echo MD5(1);
+
+        // $id is crypted ...
+        $login->id = $id;
+
+        $res = [];
+        if ($login->verifyMail()) {
+            $res["message"] = "Votre adresse mail a été vérifié, Vous pouvez à présent acceder à l'application avec vos identifiants";
+        } else {
+            $res["message"] = "Lien endommagé ou adresse mail déja vérifiée";
+        }
+
+        return json_encode($res);
+
+    }
+
+    public function userSignupFB()
+    {
+
         $database = new Database();
         $db = $database->getConnection();
         $login = new Auth($db);
@@ -88,7 +134,7 @@ class LoginController
 
         //print_r($user);
         $token = $login->getUserToken($user["id"]);
-        
+
 
         return json_encode([
             "user" => $user,
@@ -96,8 +142,9 @@ class LoginController
         ]);
     }
 
-    public function userSignupGoogle(){
-        
+    public function userSignupGoogle()
+    {
+
         $database = new Database();
         $db = $database->getConnection();
         $login = new Auth($db);
@@ -115,7 +162,7 @@ class LoginController
 
         //print_r($user);
         $token = $login->getUserToken($user["id"]);
-        
+
 
         return json_encode([
             "user" => $user,
@@ -123,7 +170,8 @@ class LoginController
         ]);
     }
 
-    public function userLogin(){
+    public function userLogin()
+    {
         //instantiate database and market object
         $database = new Database();
         $db = $database->getConnection();
@@ -137,7 +185,7 @@ class LoginController
         $res = $login->userLogin();
 
         // if error return message
-        if (isset($res["message"])){
+        if (isset($res["message"])) {
             http_response_code(400);
 
             exit();
@@ -146,7 +194,7 @@ class LoginController
         // there is no error
         http_response_code(200);
 
-        if (isset($res["token"])){
+        if (isset($res["token"])) {
             return json_encode($res);
         }
 

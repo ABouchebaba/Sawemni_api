@@ -74,7 +74,7 @@ class Auth
 
         $query = "INSERT INTO `usersinfo` 
                   ( `idUser`, `FName`, `email`, `pseudo`, `verified`, `canAddprice`) 
-                  VALUES ( ?, ?, ?, ?, 1, 1);";
+                  VALUES ( ?, ?, ?, ?, 0, 1);";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$id, $this->fullName, $this->email, $this->email]);
@@ -261,6 +261,20 @@ class Auth
                 "fullName" => $this->fullName
                 ];
         }
+    }
+
+    public function verifyMail()
+    {
+
+        $query = "UPDATE usersinfo 
+                  SET verified = true 
+                  WHERE MD5(id) = ? ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([ $this->id]);
+
+        return ($stmt->rowCount() == 1);
+
     }
 
 }
